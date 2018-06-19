@@ -31,6 +31,7 @@ namespace OrderEntryMockingPracticeTests
             product3.Sku = "sku2";
             orderItem3.Product = product3;
 
+            //Act
             OrderSummary orderSummary = new OrderSummary();
             orderSummary.OrderItems = new System.Collections.Generic.List<OrderItem>() {
                 orderItem1,
