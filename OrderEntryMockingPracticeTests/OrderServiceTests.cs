@@ -26,7 +26,7 @@ namespace OrderEntryMockingPracticeTests
 
         private const string product_sku_1 = "product_sku_1";
         private const string product_sku_2 = "product_sku_2";
-        
+        private const string product_sku_3 = "product_sku_3";
 
         private const int customer_id_1 = 12345;
         private const int customer_id_2 = 23456;
@@ -86,21 +86,35 @@ namespace OrderEntryMockingPracticeTests
             //Act and Assert
 
             Assert.Throws<OrderItemsAreNotUniqueBySKUException>
-                (() => _orderService.PlaceOrder(_order));
+                (() => _orderService.PlaceOrder(_order, _mockProductRepository.Object));
         }
 
         [Test]
-        public void Check_All_Products_Are_In_Stock()
+        public void Check_All_Products_Are_Not_In_Stock()
         {
-            
-        }
+            _order = new Order();
+            OrderItem orderItem1 = new OrderItem
+            {
+                Product = new Product()
+            };
+            orderItem1.Product.Sku = product_sku_3;
 
-        [Test]
-        public void If_Order_Is_Valid_Return_Order_Summary()
-        {
+            OrderItem orderItem2 = new OrderItem
+            {
+                Product = new Product()
+            };
+            orderItem2.Product.Sku = product_sku_1;
+
+            _order.OrderItems = new System.Collections.Generic.List<OrderItem>()
+            {
+                orderItem1,
+                orderItem2
+            };
+
+            Assert.Throws<OrderItemsAreNotInStockException>
+                 (() => _orderService.PlaceOrder(_order, _mockProductRepository.Object));
 
         }
-        
 
     }
 }

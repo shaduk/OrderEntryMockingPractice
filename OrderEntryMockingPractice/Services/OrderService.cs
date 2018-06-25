@@ -11,7 +11,7 @@ namespace OrderEntryMockingPractice.Services
         private readonly OrderSummary _orderSummary;
         private readonly Product _product;
         private readonly TaxEntry _taxEntry;
-        private readonly Order _order;
+
 
         public bool CheckOrderItemsAreUniqueBySKU(Order order)
         {
@@ -34,11 +34,32 @@ namespace OrderEntryMockingPractice.Services
             return CheckOrderItemsAreUniqueBySKU(order);
         }
 
-        public OrderSummary PlaceOrder(Order order)
+        public bool CheckIfProductIsInStock(Order order, IProductRepository productRepository)
+        {
+            /*
+            bool f = order.OrderItems
+                 .Select(item => item.Product.Sku) */
+
+            foreach(OrderItem orderItem in order.OrderItems.ToList())
+            {
+                if(productRepository.IsInStock(orderItem.Product.Sku) == false)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        public OrderSummary PlaceOrder(Order order, IProductRepository productRepository)
         {
             if(CheckIfOrderIsValid(order) == false)
             {
                 throw new OrderItemsAreNotUniqueBySKUException();
+            }
+
+            if(CheckIfProductIsInStock(order, productRepository) == false)
+            {
+                throw new OrderItemsAreNotInStockException();
             }
             return null;
         }
