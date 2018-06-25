@@ -90,7 +90,34 @@ namespace OrderEntryMockingPracticeTests
         }
 
         [Test]
-        public void Check_All_Products_Are_Not_In_Stock()
+        public void If_Order_Items_Are_Unique_By_SKU_Return_Order_Summary()
+        {
+            //Arrange
+            _order = new Order();
+            OrderItem orderItem1 = new OrderItem
+            {
+                Product = new Product()
+            };
+            orderItem1.Product.Sku = product_sku_2;
+
+            OrderItem orderItem2 = new OrderItem
+            {
+                Product = new Product()
+            };
+            orderItem2.Product.Sku = product_sku_1;
+
+            _order.OrderItems = new System.Collections.Generic.List<OrderItem>()
+            {
+                orderItem1,
+                orderItem2
+            };
+
+            //Act and Assert
+            Assert.IsInstanceOf<OrderSummary>(_orderService.PlaceOrder(_order, _mockProductRepository.Object));
+        }
+
+        [Test]
+        public void Check_All_Products_Are_Not_In_Stock_throw_Exception()
         {
             _order = new Order();
             OrderItem orderItem1 = new OrderItem
@@ -113,8 +140,33 @@ namespace OrderEntryMockingPracticeTests
 
             Assert.Throws<OrderItemsAreNotInStockException>
                  (() => _orderService.PlaceOrder(_order, _mockProductRepository.Object));
-
         }
+
+        [Test]
+        public void Check_All_Products_Are_In_Stock_Returns_OrderSummary()
+        {
+            _order = new Order();
+            OrderItem orderItem1 = new OrderItem
+            {
+                Product = new Product()
+            };
+            orderItem1.Product.Sku = product_sku_2;
+
+            OrderItem orderItem2 = new OrderItem
+            {
+                Product = new Product()
+            };
+            orderItem2.Product.Sku = product_sku_1;
+
+            _order.OrderItems = new System.Collections.Generic.List<OrderItem>()
+            {
+                orderItem1,
+                orderItem2
+            };
+
+            Assert.IsInstanceOf<OrderSummary>(_orderService.PlaceOrder(_order, _mockProductRepository.Object));
+        }
+
 
     }
 }

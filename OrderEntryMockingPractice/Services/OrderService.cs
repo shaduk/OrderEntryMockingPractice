@@ -29,11 +29,6 @@ namespace OrderEntryMockingPractice.Services
             }
         }
 
-        public bool CheckIfOrderIsValid(Order order)
-        {
-            return CheckOrderItemsAreUniqueBySKU(order);
-        }
-
         public bool CheckIfProductIsInStock(Order order, IProductRepository productRepository)
         {
             /*
@@ -52,7 +47,7 @@ namespace OrderEntryMockingPractice.Services
 
         public OrderSummary PlaceOrder(Order order, IProductRepository productRepository)
         {
-            if(CheckIfOrderIsValid(order) == false)
+            if(CheckOrderItemsAreUniqueBySKU(order) == false)
             {
                 throw new OrderItemsAreNotUniqueBySKUException();
             }
@@ -61,7 +56,9 @@ namespace OrderEntryMockingPractice.Services
             {
                 throw new OrderItemsAreNotInStockException();
             }
-            return null;
+
+
+            return new OrderSummary();
         }
     }
 }
