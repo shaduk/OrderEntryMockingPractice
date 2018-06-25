@@ -70,6 +70,7 @@
     <Compile Include="Models\Order.cs" />
     <Compile Include="Models\OrderItem.cs" />
     <Compile Include="Models\OrderConfirmation.cs" />
+    <Compile Include="Services\OrderItemsAreNotUniqueBySKUException.cs" />
     <Compile Include="Services\OrderService.cs" />
     <Compile Include="Models\OrderSummary.cs" />
     <Compile Include="Models\Product.cs" />
