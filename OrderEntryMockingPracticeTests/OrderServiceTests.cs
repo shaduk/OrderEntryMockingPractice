@@ -45,7 +45,7 @@ namespace OrderEntryMockingPracticeTests
                 .Setup(p => p.IsInStock(product_sku_2))
                 .Returns(true);
 
-            _orderService = new OrderService();
+            _orderService = new OrderService(_mockProductRepository.Object);
         }
 
         private Order CreateOrderObject(string product_sku_1, string product_sku_2)
@@ -84,7 +84,7 @@ namespace OrderEntryMockingPracticeTests
             //Act and Assert
 
             Assert.Throws<OrderItemsAreNotUniqueBySKUException>
-                (() => _orderService.PlaceOrder(_order, _mockProductRepository.Object));
+                (() => _orderService.PlaceOrder(_order));
         }
 
         [Test]
@@ -94,7 +94,7 @@ namespace OrderEntryMockingPracticeTests
             _order = CreateOrderObject(product_sku_1, product_sku_2);
 
             //Act and Assert
-            Assert.IsInstanceOf<OrderSummary>(_orderService.PlaceOrder(_order, _mockProductRepository.Object));
+            Assert.IsInstanceOf<OrderSummary>(_orderService.PlaceOrder(_order));
         }
 
         [Test]
@@ -103,7 +103,7 @@ namespace OrderEntryMockingPracticeTests
             _order = CreateOrderObject(product_sku_1, product_sku_3);
 
             Assert.Throws<OrderItemsAreNotInStockException>
-                 (() => _orderService.PlaceOrder(_order, _mockProductRepository.Object));
+                 (() => _orderService.PlaceOrder(_order));
         }
 
         [Test]
@@ -111,7 +111,7 @@ namespace OrderEntryMockingPracticeTests
         {
             _order = CreateOrderObject(product_sku_1, product_sku_2);
 
-            Assert.IsInstanceOf<OrderSummary>(_orderService.PlaceOrder(_order, _mockProductRepository.Object));
+            Assert.IsInstanceOf<OrderSummary>(_orderService.PlaceOrder(_order));
         }
         
         [Test]

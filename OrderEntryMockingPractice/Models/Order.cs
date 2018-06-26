@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace OrderEntryMockingPractice.Models
 {
@@ -11,5 +12,21 @@ namespace OrderEntryMockingPractice.Models
         
         public int? CustomerId { get; set; }
         public List<OrderItem> OrderItems { get; set; }
+
+        public bool CheckOrderItemsAreUniqueBySKU()
+        {
+            int uniqueItems = this.OrderItems
+                .Select(item => item.Product.Sku).Distinct().Count();
+            int totalItems = OrderItems.Count();
+
+            if (totalItems != uniqueItems)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
     }
 }

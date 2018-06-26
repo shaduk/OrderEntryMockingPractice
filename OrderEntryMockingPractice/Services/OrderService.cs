@@ -11,22 +11,11 @@ namespace OrderEntryMockingPractice.Services
         private readonly OrderSummary _orderSummary;
         private readonly Product _product;
         private readonly TaxEntry _taxEntry;
+        private IProductRepository _productRepository;
 
-
-        public bool CheckOrderItemsAreUniqueBySKU(Order order)
+        public OrderService(IProductRepository productRepository)
         {
-            int uniqueItems = order.OrderItems
-                .Select(item => item.Product.Sku).Distinct().Count();
-            int totalItems = order.OrderItems.Count();
-
-            if (totalItems != uniqueItems)
-            {
-                return false;
-            }
-            else
-            {
-                return true;
-            }
+            _productRepository = productRepository;
         }
 
         public bool CheckIfProductIsInStock(Order order, IProductRepository productRepository)
@@ -45,14 +34,14 @@ namespace OrderEntryMockingPractice.Services
             return true;
         }
 
-        public OrderSummary PlaceOrder(Order order, IProductRepository productRepository)
+        public OrderSummary PlaceOrder(Order order)
         {
-            if(CheckOrderItemsAreUniqueBySKU(order) == false)
+            if(order.CheckOrderItemsAreUniqueBySKU() == false)
             {
                 throw new OrderItemsAreNotUniqueBySKUException();
             }
 
-            if(CheckIfProductIsInStock(order, productRepository) == false)
+            if(CheckIfProductIsInStock(order, _productRepository) == false)
             {
                 throw new OrderItemsAreNotInStockException();
             }
