@@ -66,6 +66,7 @@
     <Compile Include="CustomerInfoTests.cs" />
     <Compile Include="OrderServiceTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TaxServiceTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Connected Services\" />
