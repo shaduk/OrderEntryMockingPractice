@@ -32,11 +32,16 @@ namespace OrderEntryMockingPracticeTests
         }
 
         [Test]
-        public void GetCustomer_Repo_Returns_Customer()
+        public void GetCustomer_Repo_Returns_Customer_If_Present()
         {
             Assert.IsInstanceOf<Customer>(_mockCustomerRepository.Object.Get(customer_id_1));
             Assert.IsInstanceOf<Customer>(_mockCustomerRepository.Object.Get(customer_id_2));
         }
 
+        [Test]
+        public void GetCustomer_Repo_Returns_Null_If_Not_Present()
+        {
+
+        }
     }
 }
