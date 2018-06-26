@@ -36,7 +36,6 @@ namespace OrderEntryMockingPracticeTests
             _mockEmailService = new Mock<IEmailService>();
             _mockTaxRateService = new Mock<ITaxRateService>();
             _mockOrderFulfillmentService = new Mock<IOrderFulfillmentService>();
-            _customer = new Customer();
 
             _mockProductRepository
                 .Setup(p => p.IsInStock(product_sku_1))
@@ -49,17 +48,14 @@ namespace OrderEntryMockingPracticeTests
             _orderService = new OrderService();
         }
 
-        [Test]
-        
-        public void If_Order_Items_Are__Not_Unique_By_SKU_Throw_Exception()
+        private Order CreateOrderObject(string product_sku_1, string product_sku_2)
         {
-            //Arrange
             _order = new Order();
             OrderItem orderItem1 = new OrderItem
             {
                 Product = new Product()
             };
-            orderItem1.Product.Sku = product_sku_1;
+            orderItem1.Product.Sku = product_sku_2;
 
             OrderItem orderItem2 = new OrderItem
             {
@@ -72,6 +68,18 @@ namespace OrderEntryMockingPracticeTests
                 orderItem1,
                 orderItem2
             };
+            return _order;
+        }
+
+        [Test]
+        
+        public void If_Order_Items_Are__Not_Unique_By_SKU_Throw_Exception()
+        {
+            //Arrange
+            // var order = CreateOrder(product_sku_1, product_sku_2) 
+            // investigate params array arguments in c#
+
+            _order = CreateOrderObject(product_sku_1, product_sku_1);
 
             //Act and Assert
 
@@ -83,24 +91,7 @@ namespace OrderEntryMockingPracticeTests
         public void If_Order_Items_Are_Unique_By_SKU_Return_Order_Summary()
         {
             //Arrange
-            _order = new Order();
-            OrderItem orderItem1 = new OrderItem
-            {
-                Product = new Product()
-            };
-            orderItem1.Product.Sku = product_sku_2;
-
-            OrderItem orderItem2 = new OrderItem
-            {
-                Product = new Product()
-            };
-            orderItem2.Product.Sku = product_sku_1;
-
-            _order.OrderItems = new System.Collections.Generic.List<OrderItem>()
-            {
-                orderItem1,
-                orderItem2
-            };
+            _order = CreateOrderObject(product_sku_1, product_sku_2);
 
             //Act and Assert
             Assert.IsInstanceOf<OrderSummary>(_orderService.PlaceOrder(_order, _mockProductRepository.Object));
@@ -109,24 +100,7 @@ namespace OrderEntryMockingPracticeTests
         [Test]
         public void Check_All_Products_Are_Not_In_Stock_throw_Exception()
         {
-            _order = new Order();
-            OrderItem orderItem1 = new OrderItem
-            {
-                Product = new Product()
-            };
-            orderItem1.Product.Sku = product_sku_3;
-
-            OrderItem orderItem2 = new OrderItem
-            {
-                Product = new Product()
-            };
-            orderItem2.Product.Sku = product_sku_1;
-
-            _order.OrderItems = new System.Collections.Generic.List<OrderItem>()
-            {
-                orderItem1,
-                orderItem2
-            };
+            _order = CreateOrderObject(product_sku_1, product_sku_3);
 
             Assert.Throws<OrderItemsAreNotInStockException>
                  (() => _orderService.PlaceOrder(_order, _mockProductRepository.Object));
@@ -135,28 +109,16 @@ namespace OrderEntryMockingPracticeTests
         [Test]
         public void Check_All_Products_Are_In_Stock_Returns_OrderSummary()
         {
-            _order = new Order();
-            OrderItem orderItem1 = new OrderItem
-            {
-                Product = new Product()
-            };
-            orderItem1.Product.Sku = product_sku_2;
-
-            OrderItem orderItem2 = new OrderItem
-            {
-                Product = new Product()
-            };
-            orderItem2.Product.Sku = product_sku_1;
-
-            _order.OrderItems = new System.Collections.Generic.List<OrderItem>()
-            {
-                orderItem1,
-                orderItem2
-            };
+            _order = CreateOrderObject(product_sku_1, product_sku_2);
 
             Assert.IsInstanceOf<OrderSummary>(_orderService.PlaceOrder(_order, _mockProductRepository.Object));
         }
         
+        [Test]
+        public void Test()
+        {
+
+        }
 
 
     }
