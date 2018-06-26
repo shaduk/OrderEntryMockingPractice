@@ -28,9 +28,6 @@ namespace OrderEntryMockingPracticeTests
         private const string product_sku_2 = "product_sku_2";
         private const string product_sku_3 = "product_sku_3";
 
-        private const int customer_id_1 = 12345;
-        private const int customer_id_2 = 23456;
-
         [SetUp]
         public void SetUp()
         {
@@ -39,6 +36,7 @@ namespace OrderEntryMockingPracticeTests
             _mockEmailService = new Mock<IEmailService>();
             _mockTaxRateService = new Mock<ITaxRateService>();
             _mockOrderFulfillmentService = new Mock<IOrderFulfillmentService>();
+            _customer = new Customer();
 
             _mockProductRepository
                 .Setup(p => p.IsInStock(product_sku_1))
@@ -47,14 +45,6 @@ namespace OrderEntryMockingPracticeTests
             _mockProductRepository
                 .Setup(p => p.IsInStock(product_sku_2))
                 .Returns(true);
-
-            _mockCustomerRepository
-                .Setup(c => c.Get(customer_id_1))
-                .Returns(_customer);
-
-            _mockCustomerRepository
-                .Setup(c => c.Get(customer_id_2))
-                .Returns(_customer);
 
             _orderService = new OrderService();
         }
@@ -166,7 +156,7 @@ namespace OrderEntryMockingPracticeTests
 
             Assert.IsInstanceOf<OrderSummary>(_orderService.PlaceOrder(_order, _mockProductRepository.Object));
         }
-
+        
 
     }
 }
