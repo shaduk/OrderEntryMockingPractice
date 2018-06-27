@@ -98,7 +98,7 @@ namespace OrderEntryMockingPracticeTests
         }
 
         [Test]
-        public void Check_All_Products_Are_Not_In_Stock_throw_Exception()
+        public void Test_All_Products_Are_Not_In_Stock_throw_Exception()
         {
             _order = CreateOrderObject(product_sku_1, product_sku_3);
 
@@ -107,7 +107,7 @@ namespace OrderEntryMockingPracticeTests
         }
 
         [Test]
-        public void Check_All_Products_Are_In_Stock_Returns_OrderSummary()
+        public void Test_All_Products_Are_In_Stock_Returns_OrderSummary()
         {
             _order = CreateOrderObject(product_sku_1, product_sku_2);
 

@@ -18,7 +18,7 @@ namespace OrderEntryMockingPractice.Services
             _productRepository = productRepository;
         }
 
-        public bool CheckIfProductIsInStock(Order order, IProductRepository productRepository)
+        public bool IsProductInStock(Order order, IProductRepository productRepository)
         {
             /*
             bool f = order.OrderItems
@@ -36,12 +36,12 @@ namespace OrderEntryMockingPractice.Services
 
         public OrderSummary PlaceOrder(Order order)
         {
-            if(order.CheckOrderItemsAreUniqueBySKU() == false)
+            if(order.AreOrderItemsAreUniqueBySKU() == false)
             {
                 throw new OrderItemsAreNotUniqueBySKUException();
             }
 
-            if(CheckIfProductIsInStock(order, _productRepository) == false)
+            if(IsProductInStock(order, _productRepository) == false)
             {
                 throw new OrderItemsAreNotInStockException();
             }
@@ -49,5 +49,6 @@ namespace OrderEntryMockingPractice.Services
 
             return new OrderSummary();
         }
+
     }
 }
