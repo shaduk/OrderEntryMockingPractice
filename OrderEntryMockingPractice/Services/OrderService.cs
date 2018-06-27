@@ -1,17 +1,11 @@
-﻿using OrderEntryMockingPractice.Models;
-using System.Linq;
+﻿using System.Linq;
+using OrderEntryMockingPractice.Models;
 
 namespace OrderEntryMockingPractice.Services
 {
     public class OrderService
     {
-        private readonly OrderService _orderService;
-        private readonly Customer _customer;
-        private readonly OrderConfirmation _orderConfirmation;
-        private readonly OrderSummary _orderSummary;
-        private readonly Product _product;
-        private readonly TaxEntry _taxEntry;
-        private IProductRepository _productRepository;
+        private readonly IProductRepository _productRepository;
 
         public OrderService(IProductRepository productRepository)
         {
@@ -20,32 +14,26 @@ namespace OrderEntryMockingPractice.Services
 
         public bool CheckIfProductIsInStock(Order order, IProductRepository productRepository)
         {
-            /*
-            bool f = order.OrderItems
-                 .Select(item => item.Product.Sku) */
-
-            foreach(OrderItem orderItem in order.OrderItems.ToList())
-            {
-                if(productRepository.IsInStock(orderItem.Product.Sku) == false)
-                {
+            foreach (var orderItem in order.OrderItems.ToList())
+                if (productRepository.IsInStock(orderItem.Product.Sku) == false)
                     return false;
-                }
-            }
             return true;
         }
 
         public OrderSummary PlaceOrder(Order order)
         {
-            if(order.CheckOrderItemsAreUniqueBySKU() == false)
-            {
-                throw new OrderItemsAreNotUniqueBySKUException();
-            }
+            if (order.CheckOrderItemsAreUniqueBySKU() == false) throw new OrderItemsAreNotUniqueBySKUException();
 
-            if(CheckIfProductIsInStock(order, _productRepository) == false)
-            {
+            if (CheckIfProductIsInStock(order, _productRepository) == false)
                 throw new OrderItemsAreNotInStockException();
-            }
 
+            var orderSummary = new OrderSummary
+            {
+                OrderId = 12,
+                OrderNumber = "randomnumber",
+                OrderItems = order.OrderItems,
+                CustomerId = 34
+            };
 
             return new OrderSummary();
         }

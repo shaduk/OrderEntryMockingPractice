@@ -1,21 +1,14 @@
-﻿using NUnit.Framework;
-using OrderEntryMockingPractice.Models;
-using System;
+﻿using System.Collections.Generic;
 using Moq;
-using System.Linq;
+using NUnit.Framework;
+using OrderEntryMockingPractice.Models;
 using OrderEntryMockingPractice.Services;
-using System.Collections.Generic;
 
 namespace OrderEntryMockingPracticeTests
 {
     [TestFixture]
     public class TaxServiceTests
     {
-        private IEnumerable<TaxEntry> _taxEntries;
-        private Mock<ITaxRateService> _mockTaxRateService;
-        private const string postal_code = "98052";
-        private const string country = "USA";
-
         [SetUp]
         public void SetUp()
         {
@@ -26,6 +19,11 @@ namespace OrderEntryMockingPracticeTests
                 .Setup(c => c.GetTaxEntries(postal_code, country))
                 .Returns(_taxEntries);
         }
+
+        private IEnumerable<TaxEntry> _taxEntries;
+        private Mock<ITaxRateService> _mockTaxRateService;
+        private const string postal_code = "98052";
+        private const string country = "USA";
 
         [Test]
         public void Can_Retrive_Taxes_From_Taxrate_Service()
