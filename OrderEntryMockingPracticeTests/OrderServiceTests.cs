@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Moq;
 using NUnit.Framework;
 using OrderEntryMockingPractice.Models;
@@ -26,16 +27,16 @@ namespace OrderEntryMockingPracticeTests
                 .Setup(p => p.IsInStock(product_sku_2))
                 .Returns(true);
 
-            _orderService = new OrderService(_mockProductRepository.Object);
+            _mockOrderFulfillmentService
+                .Setup(p => p.Fulfill(_order))
+                .Returns(_orderConfirmation);
+
+            _orderService = new OrderService(_mockProductRepository.Object, _mockTaxRateService.Object, _mockEmailService.Object, _mockOrderFulfillmentService.Object, postal_code, country);
         }
 
         private OrderService _orderService;
-        private Customer _customer;
-        private OrderConfirmation _orderConfirmation;
-        private OrderSummary _orderSummary;
-        private Product _product;
-        private TaxEntry _taxEntry;
         private Order _order;
+        private OrderConfirmation _orderConfirmation;
 
         private Mock<IProductRepository> _mockProductRepository;
         private Mock<ICustomerRepository> _mockCustomerRepository;
@@ -46,6 +47,18 @@ namespace OrderEntryMockingPracticeTests
         private const string product_sku_1 = "product_sku_1";
         private const string product_sku_2 = "product_sku_2";
         private const string product_sku_3 = "product_sku_3";
+
+        private const int customer_id_1 = 12345;
+        private const int customer_id_2 = 23456;
+
+        private const int order_id_1 = 12;
+        private const int order_id_2 = 14;
+
+        private const string order_no_1 = "1123";
+        private const string order_no_2 = "2332";
+
+        private const string postal_code = "98052";
+        private const string country = "USA";
 
         private Order CreateOrderObject(string product_sku_1, string product_sku_2)
         {
@@ -69,14 +82,24 @@ namespace OrderEntryMockingPracticeTests
             };
             return _order;
         }
+        private OrderConfirmation CreateOrderConfirmationObject(int customerId, int orderId, string orderNumber)
+        {
+            OrderConfirmation orderConfirmationObject = new OrderConfirmation();
+            orderConfirmationObject.CustomerId = customerId;
+            orderConfirmationObject.OrderId = orderId;
+            orderConfirmationObject.OrderNumber = orderNumber;
+            return orderConfirmationObject;
+        }
 
         [Test]
         public void Check_All_Products_Are_In_Stock_Returns_OrderSummary()
         {
             _order = CreateOrderObject(product_sku_1, product_sku_2);
-
+            _orderConfirmation = CreateOrderConfirmationObject(customer_id_1, order_id_1, order_no_1);
             Assert.IsInstanceOf<OrderSummary>(_orderService.PlaceOrder(_order));
         }
+
+        
 
         [Test]
         public void Check_All_Products_Are_Not_In_Stock_throw_Exception()
@@ -90,10 +113,6 @@ namespace OrderEntryMockingPracticeTests
         [Test]
         public void If_Order_Items_Are__Not_Unique_By_SKU_Throw_Exception()
         {
-            //Arrange
-            // var order = CreateOrder(product_sku_1, product_sku_2) 
-            // investigate params array arguments in c#
-
             _order = CreateOrderObject(product_sku_1, product_sku_1);
 
             //Act and Assert
@@ -115,6 +134,7 @@ namespace OrderEntryMockingPracticeTests
         [Test]
         public void Test()
         {
+
         }
     }
 }

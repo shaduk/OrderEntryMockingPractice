@@ -6,13 +6,27 @@ namespace OrderEntryMockingPractice.Services
     public class OrderService
     {
         private readonly IProductRepository _productRepository;
+        private readonly IOrderFulfillmentService _orderFulfillmentService;
+        private readonly ITaxRateService _taxRateService;
+        private readonly IEmailService _emailService;
+        private string _postal_code;
+        private string _country;
 
-        public OrderService(IProductRepository productRepository)
+        public OrderService(IProductRepository productRepository,
+            ITaxRateService taxRateService,
+            IEmailService emailService,
+            IOrderFulfillmentService orderFulfillmentService,
+            string postal_code, string country)
         {
             _productRepository = productRepository;
+            _taxRateService = taxRateService;
+            _orderFulfillmentService = orderFulfillmentService;
+            _emailService = emailService;
+            _postal_code = postal_code;
+            _country = country;
         }
 
-        public bool CheckIfProductIsInStock(Order order, IProductRepository productRepository)
+        public bool AreProductsInStock(Order order, IProductRepository productRepository)
         {
             foreach (var orderItem in order.OrderItems.ToList())
                 if (productRepository.IsInStock(orderItem.Product.Sku) == false)
@@ -20,22 +34,40 @@ namespace OrderEntryMockingPractice.Services
             return true;
         }
 
+        public decimal GetTotalTax()
+        {
+            decimal total_tax = 0;
+
+            foreach (TaxEntry entry in _taxRateService.GetTaxEntries(_postal_code, _country))
+                total_tax += entry.Rate;
+
+            return total_tax;
+        }
+
         public OrderSummary PlaceOrder(Order order)
         {
-            if (order.CheckOrderItemsAreUniqueBySKU() == false) throw new OrderItemsAreNotUniqueBySKUException();
+            if (order.AreOrderItemsUniqueBySKU() == false) throw new OrderItemsAreNotUniqueBySKUException();
 
-            if (CheckIfProductIsInStock(order, _productRepository) == false)
+            if (AreProductsInStock(order, _productRepository) == false)
                 throw new OrderItemsAreNotInStockException();
 
-            var orderSummary = new OrderSummary
+            OrderConfirmation orderConfirmation = _orderFulfillmentService.Fulfill(order);
+
+            OrderSummary orderSummary = new OrderSummary
             {
-                OrderId = 12,
-                OrderNumber = "randomnumber",
+                OrderId = orderConfirmation.OrderId,
+                OrderNumber = orderConfirmation.OrderNumber,
+                CustomerId = orderConfirmation.CustomerId,
                 OrderItems = order.OrderItems,
-                CustomerId = 34
+                NetTotal = order.GetOrderTotal(),
+                OrderTotal = order.GetOrderTotal() + GetTotalTax(),
+                Taxes = _taxRateService.GetTaxEntries(_postal_code, _country),
+
             };
 
-            return new OrderSummary();
+            _emailService.SendOrderConfirmationEmail(orderConfirmation.CustomerId, orderConfirmation.OrderId);
+
+            return orderSummary;
         }
     }
 }

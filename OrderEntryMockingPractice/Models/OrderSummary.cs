@@ -12,7 +12,7 @@ namespace OrderEntryMockingPractice.Models
         public List<OrderItem> OrderItems { get; set; }
         public decimal NetTotal { get; set; }
         public IEnumerable<TaxEntry> Taxes { get; set; }
-        public decimal Total { get; set; }
+        public decimal OrderTotal { get; set; }
         public DateTime EstimatedDeliveryDate { get; set; }
     }
 }

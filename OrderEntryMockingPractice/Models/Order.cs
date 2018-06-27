@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using OrderEntryMockingPractice.Services;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace OrderEntryMockingPractice.Models
@@ -13,7 +14,7 @@ namespace OrderEntryMockingPractice.Models
         public int? CustomerId { get; set; }
         public List<OrderItem> OrderItems { get; set; }
 
-        public bool AreOrderItemsAreUniqueBySKU()
+        public bool AreOrderItemsUniqueBySKU()
         {
             int uniqueItems = this.OrderItems
                 .Select(item => item.Product.Sku).Distinct().Count();
@@ -28,5 +29,19 @@ namespace OrderEntryMockingPractice.Models
                 return true;
             }
         }
+        
+        public decimal GetOrderTotal()
+        {
+            decimal totalPrice = 0;
+
+            foreach (OrderItem item in this.OrderItems)
+            {
+                totalPrice += item.GetNetPrice();
+            }
+            return totalPrice;
+        }
+
+
+        
     }
 }
