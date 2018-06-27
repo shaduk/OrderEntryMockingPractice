@@ -1,21 +1,13 @@
-﻿using NUnit.Framework;
+﻿using Moq;
+using NUnit.Framework;
 using OrderEntryMockingPractice.Models;
-using System;
-using Moq;
-using System.Linq;
 using OrderEntryMockingPractice.Services;
 
 namespace OrderEntryMockingPracticeTests
 {
-
     [TestFixture]
-    class CustomerInfoTests
+    internal class CustomerInfoTests
     {
-        private Customer _customer;
-        private Mock<ICustomerRepository> _mockCustomerRepository;
-        private const int customer_id_1 = 12345;
-        private const int customer_id_2 = 23456;
-
         [SetUp]
         public void SetUp()
         {
@@ -31,6 +23,11 @@ namespace OrderEntryMockingPracticeTests
                 .Returns(_customer);
         }
 
+        private Customer _customer;
+        private Mock<ICustomerRepository> _mockCustomerRepository;
+        private const int customer_id_1 = 12345;
+        private const int customer_id_2 = 23456;
+
         [Test]
         public void GetCustomer_Repo_Returns_Customer_If_Present()
         {
@@ -41,7 +38,6 @@ namespace OrderEntryMockingPracticeTests
         [Test]
         public void GetCustomer_Repo_Returns_Null_If_Not_Present()
         {
-
         }
     }
 }
