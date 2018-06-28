@@ -64,7 +64,7 @@ namespace OrderEntryMockingPractice.Services
                 Taxes = _taxRateService.GetTaxEntries(_postal_code, _country),
 
             };
-
+            
             _emailService.SendOrderConfirmationEmail(orderConfirmation.CustomerId, orderConfirmation.OrderId);
 
             return orderSummary;
