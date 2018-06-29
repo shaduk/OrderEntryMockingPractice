@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using OrderEntryMockingPractice.Models;
+using System.Collections.Generic;
 
 namespace OrderEntryMockingPractice.Services
 {
@@ -52,6 +53,9 @@ namespace OrderEntryMockingPractice.Services
                 throw new OrderItemsAreNotInStockException();
 
             OrderConfirmation orderConfirmation = _orderFulfillmentService.Fulfill(order);
+            IEnumerable<TaxEntry> tax_entries = _taxRateService.GetTaxEntries(_postal_code, _country);
+            decimal net_total = order.GetOrderTotal();
+            decimal order_total = net_total + GetTotalTax();
 
             OrderSummary orderSummary = new OrderSummary
             {
@@ -59,9 +63,9 @@ namespace OrderEntryMockingPractice.Services
                 OrderNumber = orderConfirmation.OrderNumber,
                 CustomerId = orderConfirmation.CustomerId,
                 OrderItems = order.OrderItems,
-                NetTotal = order.GetOrderTotal(),
-                OrderTotal = order.GetOrderTotal() + GetTotalTax(),
-                Taxes = _taxRateService.GetTaxEntries(_postal_code, _country),
+                NetTotal = net_total,
+                OrderTotal = order_total,
+                Taxes = tax_entries,
 
             };
             

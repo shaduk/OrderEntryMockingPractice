@@ -19,6 +19,7 @@ namespace OrderEntryMockingPracticeTests
             _mockTaxRateService = new Mock<ITaxRateService>();
             _mockOrderFulfillmentService = new Mock<IOrderFulfillmentService>();
             _orderConfirmation = CreateOrderConfirmationObject(customer_id_1, order_id_1, order_no_1);
+
             _taxEntries = new List<TaxEntry>()
             {
                 CreateTaxEntry("sample", 23),
@@ -36,7 +37,7 @@ namespace OrderEntryMockingPracticeTests
 
             _mockOrderFulfillmentService
                 .Setup(p => p.Fulfill(It.IsAny<Order>()))
-                .Returns(_orderConfirmation);
+                .Returns((Order order) => CreateOrderConfirmationObject(order.CustomerId, order_id_1, order_no_1));
 
             _mockTaxRateService
                 .Setup(t => t.GetTaxEntries(postal_code, country))
@@ -44,6 +45,8 @@ namespace OrderEntryMockingPracticeTests
 
             _orderService = new OrderService(_mockProductRepository.Object, _mockTaxRateService.Object, _mockEmailService.Object, _mockOrderFulfillmentService.Object, postal_code, country);
         }
+
+        
 
         private OrderService _orderService;
         private Order _order;
@@ -72,32 +75,38 @@ namespace OrderEntryMockingPracticeTests
         private const string postal_code = "98052";
         private const string country = "USA";
 
+        private const int quantity = 2;
+   
+
+        private static OrderItem CreateOrderItemObject(string product_sku, int quantity, decimal price)
+        {
+            var orderItem = new OrderItem
+            {
+                Product = new Product(),
+                Quantity = quantity
+            };
+            orderItem.Product.Sku = product_sku;
+            orderItem.Product.Price = price;
+            return orderItem;
+        }
+
         private Order CreateOrderObject(string product_sku_1, string product_sku_2)
         {
             _order = new Order();
-            var orderItem1 = new OrderItem
-            {
-                Product = new Product(),
-                Quantity = 1
-            };
-            orderItem1.Product.Sku = product_sku_2;
-            orderItem1.Product.Price = 20;
-
-            var orderItem2 = new OrderItem
-            {
-                Product = new Product(),
-                Quantity = 2
-            };
-            orderItem2.Product.Sku = product_sku_1;
-            orderItem2.Product.Price = 10;
+            OrderItem orderItem1 = CreateOrderItemObject(product_sku_1, 1, 30);
+            OrderItem orderItem2 = CreateOrderItemObject(product_sku_2, 2, 10);
 
             _order.OrderItems = new List<OrderItem>
             {
                 orderItem1,
                 orderItem2
             };
+            _order.CustomerId = customer_id_1;
             return _order;
         }
+
+        
+
         private OrderConfirmation CreateOrderConfirmationObject(int customerId, int orderId, string orderNumber)
         {
             var orderConfirmationObject = new OrderConfirmation();
@@ -121,6 +130,7 @@ namespace OrderEntryMockingPracticeTests
         public void Check_All_Products_Are_In_Stock_Returns_Correct_OrderSummary()
         {
             _order = CreateOrderObject(product_sku_1, product_sku_2);
+           
             OrderSummary orderSummary = _orderService.PlaceOrder(_order);
             Assert.AreEqual(orderSummary.CustomerId, customer_id_1);
             Assert.AreEqual(orderSummary.OrderId, order_id_1);
@@ -133,7 +143,7 @@ namespace OrderEntryMockingPracticeTests
         public void Check_All_Products_Are_Not_In_Stock_throw_Exception()
         {
             _order = CreateOrderObject(product_sku_1, product_sku_3);
-
+            
             Assert.Throws<OrderItemsAreNotInStockException>
                 (() => _orderService.PlaceOrder(_order));
         }
@@ -184,11 +194,11 @@ namespace OrderEntryMockingPracticeTests
         }
 
         [Test]
-        public void Test_TaxRateSernice_Returns_The_Expected_TaxRate()
+        public void Test_TaxRateService_Returns_The_Expected_TaxRate()
         {
             _order = CreateOrderObject(product_sku_1, product_sku_2);
             OrderSummary orderSummary = _orderService.PlaceOrder(_order);
-            Assert.AreEqual(orderSummary.OrderTotal, 73);
+            Assert.AreEqual(orderSummary.OrderTotal, 83);
         }
 
         [Test]
@@ -196,7 +206,7 @@ namespace OrderEntryMockingPracticeTests
         {
             _order = CreateOrderObject(product_sku_1, product_sku_2);
             OrderSummary orderSummary = _orderService.PlaceOrder(_order);
-            Assert.AreEqual(orderSummary.NetTotal, 40);
+            Assert.AreEqual(orderSummary.NetTotal, 50);
         }
 
         [Test]
@@ -206,5 +216,7 @@ namespace OrderEntryMockingPracticeTests
             OrderSummary orderSummary = _orderService.PlaceOrder(_order);
             Assert.AreEqual(orderSummary.Taxes, _taxEntries);
         }
+
+        
     }
 }
