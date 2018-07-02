@@ -26,7 +26,7 @@ namespace OrderEntryMockingPracticeTests
        private Customer CreateCustomer(int customer_id)
         {
             _customer = new Customer();
-            _customer.CustomerId = customer_id_1;
+            _customer.CustomerId = customer_id;
             return _customer;
         }
 
@@ -39,8 +39,10 @@ namespace OrderEntryMockingPracticeTests
         [Test]
         public void GetCustomer_Repo_Returns_Correct_Customer_If_Present()
         {
-            Customer _customer = _mockCustomerRepository.Object.Get(customer_id_1);
-            Assert.AreEqual(_customer.CustomerId, customer_id_1);
+            Customer _customer_1 = _mockCustomerRepository.Object.Get(customer_id_1);
+            Assert.AreEqual(_customer_1.CustomerId, customer_id_1);
+            Customer _customer_2 = _mockCustomerRepository.Object.Get(customer_id_2);
+            Assert.AreEqual(_customer_2.CustomerId, customer_id_2);
         }
 
         [Test]

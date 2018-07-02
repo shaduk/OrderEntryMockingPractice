@@ -90,7 +90,7 @@ namespace OrderEntryMockingPracticeTests
             return orderItem;
         }
 
-        private Order CreateOrderObject(string product_sku_1, string product_sku_2)
+        private Order CreateOrderObject(string product_sku_1, string product_sku_2, int customer_id = customer_id_1)
         {
             _order = new Order();
             OrderItem orderItem1 = CreateOrderItemObject(product_sku_1, 1, 30);
@@ -101,7 +101,7 @@ namespace OrderEntryMockingPracticeTests
                 orderItem1,
                 orderItem2
             };
-            _order.CustomerId = customer_id_1;
+            _order.CustomerId = customer_id;
             return _order;
         }
 
@@ -127,12 +127,12 @@ namespace OrderEntryMockingPracticeTests
         }
 
         [Test]
-        public void Check_All_Products_Are_In_Stock_Returns_Correct_OrderSummary()
+        public void Test_All_Products_Are_In_Stock_Returns_Correct_OrderSummary()
         {
-            _order = CreateOrderObject(product_sku_1, product_sku_2);
+            _order = CreateOrderObject(product_sku_1, product_sku_2, customer_id_2);
            
             OrderSummary orderSummary = _orderService.PlaceOrder(_order);
-            Assert.AreEqual(orderSummary.CustomerId, customer_id_1);
+            Assert.AreEqual(orderSummary.CustomerId, customer_id_2);
             Assert.AreEqual(orderSummary.OrderId, order_id_1);
             Assert.AreEqual(orderSummary.OrderNumber, order_no_1);
         }
@@ -140,7 +140,7 @@ namespace OrderEntryMockingPracticeTests
         
 
         [Test]
-        public void Check_All_Products_Are_Not_In_Stock_throw_Exception()
+        public void Test_All_Products_Are_Not_In_Stock_throw_Exception()
         {
             _order = CreateOrderObject(product_sku_1, product_sku_3);
             
@@ -160,17 +160,7 @@ namespace OrderEntryMockingPracticeTests
         }
 
         [Test]
-        public void If_Order_Items_Are_Unique_By_SKU_Return_Order_Summary()
-        {
-            //Arrange
-            _order = CreateOrderObject(product_sku_1, product_sku_2);
-
-            //Act and Assert
-            Assert.IsInstanceOf<OrderSummary>(_orderService.PlaceOrder(_order));
-        }
-
-        [Test]
-        public void Test_Email_Service_Has_Been_Called_Atleast_Once()
+        public void Test_Email_Service_Has_Been_Called_Once()
         {
             _order = CreateOrderObject(product_sku_1, product_sku_2);
             _orderService.PlaceOrder(_order);
@@ -186,11 +176,11 @@ namespace OrderEntryMockingPracticeTests
         }
 
         [Test]
-        public void Test_TaxRateService_Was_Called_Atleast_Once()
+        public void Test_TaxRateService_Was_Called_Once()
         {
             _order = CreateOrderObject(product_sku_1, product_sku_2);
             _orderService.PlaceOrder(_order);
-            _mockTaxRateService.Verify(s => s.GetTaxEntries(postal_code, country), Times.AtLeastOnce());
+            _mockTaxRateService.Verify(s => s.GetTaxEntries(postal_code, country), Times.Once());
         }
 
         [Test]

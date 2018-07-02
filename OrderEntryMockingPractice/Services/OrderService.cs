@@ -35,11 +35,11 @@ namespace OrderEntryMockingPractice.Services
             return true;
         }
 
-        public decimal GetTotalTax()
+        public decimal GetTotalTax(IEnumerable<TaxEntry> taxEntries)
         {
             decimal total_tax = 0;
 
-            foreach (TaxEntry entry in _taxRateService.GetTaxEntries(_postal_code, _country))
+            foreach (TaxEntry entry in taxEntries)
                 total_tax += entry.Rate;
 
             return total_tax;
@@ -54,8 +54,9 @@ namespace OrderEntryMockingPractice.Services
 
             OrderConfirmation orderConfirmation = _orderFulfillmentService.Fulfill(order);
             IEnumerable<TaxEntry> tax_entries = _taxRateService.GetTaxEntries(_postal_code, _country);
+
             decimal net_total = order.GetOrderTotal();
-            decimal order_total = net_total + GetTotalTax();
+            decimal order_total = net_total + GetTotalTax(tax_entries);
 
             OrderSummary orderSummary = new OrderSummary
             {
